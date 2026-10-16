@@ -55,9 +55,8 @@ def build_final_dataset(random_seed: int = 42):
     _, spotify_unique, matched_keys = find_billboard_spotify_matches(billboard_df, spotify_df)
 
     hit_keys = list(matched_keys)
-    matched_key_set = set(hit_keys)
     remaining_keys = spotify_unique.loc[
-        ~spotify_unique["normalized_key"].isin(matched_key_set),
+        ~spotify_unique["normalized_key"].isin(hit_keys),
         "normalized_key",
     ].unique()
 

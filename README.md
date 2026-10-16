@@ -107,12 +107,13 @@ The project performs:
 
 ## Machine Learning Models
 
-Four classification models were evaluated:
+Five classification models were evaluated:
 
 1. Logistic Regression
 2. Decision Tree
 3. Support Vector Machine (SVM)
 4. K-Nearest Neighbors (KNN)
+5. Artificial Neural Network (ANN) using `sklearn.neural_network.MLPClassifier`
 
 ### Train-Test Split
 
@@ -124,7 +125,21 @@ Four classification models were evaluated:
 ### Scaling
 
 - Logistic Regression, SVM, and KNN use `StandardScaler`.
+- The ANN uses the same training-fitted `StandardScaler`.
 - Decision Tree uses unscaled features.
+
+### ANN Architecture
+
+- Input: 9 scaled Spotify audio features
+- Hidden layers: 64 neurons followed by 32 neurons
+- Hidden-layer activation: ReLU
+- Solver: Adam
+- `max_iter=500`
+- `random_state=42`
+- Early stopping with a validation fraction of `0.1`
+
+`MLPClassifier` performs forward propagation, loss calculation, backpropagation,
+and gradient-based weight updates internally.
 
 ## Baseline Results
 
@@ -134,6 +149,9 @@ Four classification models were evaluated:
 | Logistic Regression | 0.6445 | 0.5574 | 0.5400 | 0.5486 |
 | KNN | 0.6335 | 0.5407 | 0.5563 | 0.5484 |
 | Decision Tree | 0.6015 | 0.5018 | 0.5100 | 0.5059 |
+| ANN | 0.6615 | 0.5701 | 0.6250 | 0.5963 |
+
+The ANN baseline ROC-AUC was **0.7323**.
 
 ## Hyperparameter Tuning
 
@@ -162,6 +180,18 @@ Four classification models were evaluated:
 - `n_neighbors = [3, 5, 7, 9, 11]`
 - `weights = ["uniform", "distance"]`
 
+### ANN
+
+- `hidden_layer_sizes = [(32,), (64, 32), (128, 64)]`
+- `alpha = [0.0001, 0.001]`
+- `activation = "relu"`
+- `solver = "adam"`
+- `max_iter = 500`
+- Early stopping enabled
+
+Model selection uses the highest five-fold cross-validation F1-score. The held-out
+test set is used only for final evaluation after selection.
+
 ## Tuned Results
 
 | Model | Accuracy | Precision | Recall | F1-score |
@@ -170,10 +200,16 @@ Four classification models were evaluated:
 | SVM | 0.6390 | 0.5423 | 0.6250 | 0.5807 |
 | Logistic Regression | 0.6445 | 0.5574 | 0.5400 | 0.5486 |
 | KNN | 0.6190 | 0.5239 | 0.5213 | 0.5226 |
+| ANN | 0.6615 | 0.5701 | 0.6250 | 0.5963 |
+
+The tuned ANN selected `hidden_layer_sizes=(64, 32)` and `alpha=0.0001`.
+Its cross-validation F1-score was **0.5829** and its test ROC-AUC was **0.7323**.
 
 ## Final Model
 
-The tuned Decision Tree was selected as the final model based on the highest test F1-score.
+The tuned Decision Tree was selected as the final model based on the highest
+five-fold cross-validation F1-score (**0.6226**). The held-out test set was not
+used to select the final model.
 
 ### Best Parameters
 
